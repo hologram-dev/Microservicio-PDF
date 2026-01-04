@@ -3,7 +3,6 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)](https://fastapi.tiangolo.com)
 [![ReportLab](https://img.shields.io/badge/ReportLab-4.0+-orange.svg)](https://www.reportlab.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Microservicio de exportación de PDFs construido con **FastAPI** y **ReportLab**, siguiendo los principios de **Clean Architecture**.
 
@@ -11,7 +10,6 @@ Microservicio de exportación de PDFs construido con **FastAPI** y **ReportLab**
 
 ## 📋 Tabla de Contenidos
 
-- [Descripción](#-descripción)
 - [Arquitectura](#-arquitectura)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [Tecnologías](#-tecnologías)
@@ -22,29 +20,6 @@ Microservicio de exportación de PDFs construido con **FastAPI** y **ReportLab**
 - [Docker](#-docker)
 - [Contribución](#-contribución)
 
----
-
-## 📖 Descripción
-
-Este microservicio proporciona una API REST para la generación dinámica de documentos PDF. Está diseñado para integrarse con otros sistemas que necesiten exportar información en formato PDF.
-
-### ¿Por qué ReportLab?
-
-| Criterio | ReportLab | WeasyPrint |
-|----------|-----------|------------|
-| **Dependencias** | Mínimas, puro Python | Requiere Cairo, Pango, GDK-PixBuf |
-| **Rendimiento** | Excelente para generación programática | Optimizado para conversión HTML→PDF |
-| **Control** | Pixel-perfect, control total | Depende del CSS y rendering |
-| **Caso de uso ideal** | Sin frontend existente ✅ | Cuando ya existe HTML/CSS |
-| **Curva de aprendizaje** | Moderada | Baja si sabes CSS |
-
-**Decisión técnica**: Se eligió ReportLab porque:
-1. **No existe frontend** para extraer HTML/CSS
-2. Ofrece **generación programática óptima** de PDFs
-3. **Mayor control** sobre el diseño sin dependencias de rendering web
-4. **Menor footprint** en contenedores Docker
-
----
 
 ## 🏗️ Arquitectura
 
@@ -361,25 +336,3 @@ docker-compose down
 # Reconstruir y reiniciar
 docker-compose up -d --build
 ```
-
----
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea tu feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la branch (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
----
-
-## 📞 Contacto
-
-Para preguntas o sugerencias, por favor abre un issue en el repositorio.
