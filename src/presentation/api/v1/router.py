@@ -157,6 +157,123 @@ async def generar_comprobante_postulacion(
         },
     )
 
+@router.post(
+    "/generate/comprobante_contrato",
+    response_class=StreamingResponse,
+    summary="Generar Comprobante de Contrato",
+    description="Genera un PDF con el comprobante de contrato a partir de los datos recibidos desde la API Golang",
+    responses={
+        200: {
+            "description": "PDF generado exitosamente",
+            "content": {"application/pdf": {}},
+        },
+        400: {
+            "description": "Datos inválidos en el request",
+        },
+        500: {
+            "description": "Error al generar el PDF",
+        },
+    },
+)
+async def generar_comprobante_contrato(
+    request: ComprobanteContratoRequest,
+    use_case=Depends(get_generar_comprobante_contrato_use_case),
+):
+    """
+    Genera el comprobante de contrato en formato PDF.
+    
+    Este endpoint recibe los datos de la postulación desde la API Golang
+    y genera un PDF profesional con toda la información.
+    
+    El PDF incluye:
+    - Datos del estudiante
+    - Datos académicos (universidad y carrera)
+    - Detalles de la postulación (empresa, proyecto, puesto)
+    - Estado de la postulación
+    
+    Args:
+        request: Datos validados de la postulación
+        use_case: Use case inyectado para generar el comprobante
+        
+    Returns:
+        StreamingResponse con el PDF generado
+    """
+    # 1. Convertir schemas Pydantic → DTOs de aplicación
+    comprobante_dto = ComprobanteContratoDTO(
+        estudiante=EstudianteDTO(
+            nombre=request.estudiante.nombre,
+            apellido=request.estudiante.apellido,
+            email=request.estudiante.email,
+            dni=request.estudiante.dni,
+            cuil=request.estudiante.cuil,
+            fecha_nacimiento=request.estudiante.fecha_nacimiento,
+            tipo_dni=request.estudiante.tipo_dni,
+        ),
+        universidad=UniversidadDTO(
+            nombre=request.universidad.nombre,
+            direccion=request.universidad.direccion,
+            codigo_postal=request.universidad.codigo_postal,
+            correo=request.universidad.correo,
+            telefono=request.universidad.telefono,
+        ),
+        carrera=CarreraDTO(
+            nombre=request.carrera.nombre,
+            codigo=request.carrera.codigo,
+            descripcion=request.carrera.descripcion,
+            plan_estudios=request.carrera.plan_estudios,
+        ),
+        empresa=EmpresaDTO(
+            nombre=request.empresa.nombre,
+            direccion=request.empresa.direccion,
+            codigo_postal=request.empresa.codigo_postal,
+            telefono=request.empresa.telefono,
+            codigo=request.empresa.codigo,
+        ),
+        proyecto=ProyectoDTO(
+            nombre=request.proyecto.nombre,
+            descripcion=request.proyecto.descripcion,
+            numero=request.proyecto.numero,
+            estado=request.proyecto.estado,
+            fecha_inicio=request.proyecto.fecha_inicio,
+            fecha_fin=request.proyecto.fecha_fin,
+        ),
+        puesto=PuestoDTO(
+            nombre=request.puesto.nombre,
+            descripcion=request.puesto.descripcion,
+            codigo=request.puesto.codigo,
+            horas_dedicadas=request.puesto.horas_dedicadas,
+        ),
+        postulacion=PostulacionDTO(
+            numero=request.postulacion.numero,
+            fecha=request.postulacion.fecha,
+            estado=request.postulacion.estado,
+            cantidad_materias_aprobadas=request.postulacion.cantidad_materias_aprobadas,
+            cantidad_materias_regulares=request.postulacion.cantidad_materias_regulares,
+        ),
+        contrato=ContratoDTO(
+            numero=request.contrato.numero,
+            fecha_inicio=request.contrato.fecha_inicio,
+            fecha_fin=request.contrato.fecha_fin,
+            fecha_emision=request.contrato.fecha_emision,
+            estado=request.contrato.estado,
+        ),
+    )
+    
+    # 2. Ejecutar el use case para generar el PDF
+    result = use_case.execute(comprobante_dto)
+    
+    # 3. Crear stream con el contenido del PDF
+    pdf_stream = BytesIO(result.content)
+    
+    # 4. Retornar como streaming response
+    return StreamingResponse(
+        pdf_stream,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename={result.filename}",
+        },
+    )
+
 
 @router.get("/health")
 async def health_check():
