@@ -336,3 +336,207 @@ docker-compose down
 # Reconstruir y reiniciar
 docker-compose up -d --build
 ```
+
+---
+
+## 📝 Cambios Recientes Implementados
+
+### Refactorización a Clean Architecture (Enero 2026)
+- ✅ Reestructuración completa del proyecto siguiendo Clean Architecture ortodoxa
+- ✅ Eliminación de la capa redundante `application/services`
+- ✅ Movimiento de la lógica de conversión de DTOs a los Use Cases
+- ✅ Clarificación de la distinción entre HTTP Schemas (Pydantic) y DTOs internos
+- ✅ Actualización de la inyección de dependencias para usar directamente Use Cases
+
+### Mejoras en Generación de PDFs
+- ✅ Implementación de endpoint `/api/v1/pdf/generate/comprobante_postulacion`
+- ✅ Diseño profesional con elementos narrativos (no solo tablas)
+- ✅ Formato de fechas en español argentino
+- ✅ Estructura mejorada: header con logo, tabla compacta, mensaje narrativo, firma y footer
+- ✅ Estilos modernos con soporte para elementos narrativos
+
+### Configuración Docker
+- ✅ Docker Compose configurado para instalación automática de dependencias
+- ✅ Servicio completamente containerizado sin necesidad de venv local
+- ✅ Dockerfile optimizado con multi-stage build
+
+### Documentación
+- ✅ README detallado con explicación de Clean Architecture
+- ✅ Documentación de la estructura del proyecto
+- ✅ Ejemplos de uso y guías de desarrollo
+- ✅ Análisis de optimización de rendimiento (ver `docs/performance_optimization_analysis.md`)
+
+---
+
+## 🚀 Próximas Optimizaciones
+
+> [!IMPORTANT]
+> **Estado de Rendimiento**: El sistema actual está optimizado para cargas ligeras pero **requiere optimizaciones significativas** para manejar 100,000+ requests. Ver [análisis completo](docs/performance_optimization_analysis.md) para detalles.
+
+### Fase 1: Optimizaciones Críticas (1-2 días) 🔴
+
+#### 1.1 Procesamiento Asíncrono Real
+**Prioridad**: CRÍTICA | **Impacto**: 5-10x throughput
+
+- [ ] Implementar `asyncio.to_thread()` en endpoints para desbloquear el event loop
+- [ ] Mover generación de PDF a thread pool
+- [ ] Evaluar implementación de Celery + Redis para procesamiento en cola
+
+**Estado**: No implementado  
+**Beneficio**: Elimina bloqueo del event loop durante generación de PDFs
+
+---
+
+#### 1.2 Configuración Multi-Worker con Gunicorn
+**Prioridad**: CRÍTICA | **Impacto**: 4-8x throughput
+
+- [ ] Migrar de Uvicorn standalone a Gunicorn + UvicornWorker
+- [ ] Configurar workers basados en CPU cores: `(2 × cores) + 1`
+- [ ] Ajustar timeouts y configuración de producción
+
+**Estado**: No implementado (actualmente 1 worker)  
+**Beneficio**: Aprovechamiento de múltiples cores de CPU
+
+---
+
+#### 1.3 Caché de Estilos PDF
+**Prioridad**: ALTA | **Impacto**: 20-30% reducción de latencia
+
+- [ ] Implementar singleton para estilos PDF
+- [ ] Usar `@lru_cache` para configuraciones de estilos
+- [ ] Cachear templates de secciones estáticas
+
+**Estado**: No implementado (estilos se recrean en cada request)  
+**Beneficio**: Reducción de ~20-40ms por request
+
+---
+
+### Fase 2: Optimizaciones Altas (3-5 días) 🟡
+
+#### 2.1 Simplificación de Mapeo de DTOs
+**Prioridad**: ALTA | **Impacto**: 10-20% reducción de latencia
+
+- [ ] Reemplazar mapeo manual (89 líneas) con `model_dump()`
+- [ ] Usar `model_validate()` de Pydantic para conversiones
+- [ ] Evaluar eliminación de DTOs redundantes
+
+**Estado**: Mapeo manual actual  
+**Beneficio**: Reducción de tiempo de CPU y código más mantenible
+
+---
+
+#### 2.2 Rate Limiting y Protección
+**Prioridad**: MEDIA | **Impacto**: Protección contra sobrecarga
+
+- [ ] Implementar `slowapi` o middleware custom
+- [ ] Configurar límites por IP y por endpoint
+- [ ] Agregar throttling configurable
+
+**Estado**: No implementado  
+**Beneficio**: Protección contra DDoS y gestión de carga
+
+---
+
+#### 2.3 Métricas y Observabilidad
+**Prioridad**: MEDIA | **Impacto**: Operacional crítico
+
+- [ ] Integrar Prometheus para métricas
+- [ ] Implementar logging estructurado
+- [ ] Agregar tracing con Jaeger (opcional)
+- [ ] Dashboard Grafana para monitoreo
+
+**Estado**: No implementado  
+**Beneficio**: Visibilidad de rendimiento y debugging
+
+---
+
+### Fase 3: Arquitectura Escalable (1-2 semanas) 🟢
+
+#### 3.1 Sistema de Colas Asíncrono (Opcional)
+**Prioridad**: BAJA | **Impacto**: Escalabilidad horizontal
+
+- [ ] Implementar Celery para procesamiento en background
+- [ ] Configurar Redis como message broker
+- [ ] API: retornar Task ID, cliente consulta status
+- [ ] Almacenamiento temporal en S3/MinIO
+
+**Estado**: No implementado  
+**Beneficio**: Desacoplamiento total, retry automático, escalabilidad
+
+---
+
+#### 3.2 Optimizaciones de Código
+**Prioridad**: BAJA | **Impacto**: 1.2-2x mejora
+
+- [ ] Optimizar parsing de fechas con caché
+- [ ] Eliminar validaciones redundantes
+- [ ] Implementar streaming de respuestas con chunks
+- [ ] Pool de recursos para generación paralela
+
+**Estado**: Parcialmente implementado  
+**Beneficio**: Mejoras incrementales en latencia
+
+---
+
+### Capacidad Estimada
+
+| Configuración | Requests/Segundo | 100K Requests |
+|---------------|------------------|---------------|
+| **Actual** (1 worker, síncrono) | 2-10 | 2.7-14 horas |
+| **Fase 1** (multi-worker + async) | 50-150 | 11-33 minutos |
+| **Fase 2** (+ cache + rate limit) | 100-250 | 6-16 minutos |
+| **Fase 3** (+ cola asíncrona) | 200-500 | 3-8 minutos |
+
+> [!NOTE]
+> Estas son estimaciones teóricas. Se requiere load testing con Locust/k6 para validar números reales.
+
+---
+
+## 📊 Roadmap de Desarrollo
+
+```mermaid
+gantt
+    title Plan de Optimización del Microservicio PDF
+    dateFormat  YYYY-MM-DD
+    section Fase 1 - Crítico
+    Async Processing           :crit, a1, 2026-01-09, 2d
+    Multi-Worker Config        :crit, a2, 2026-01-09, 1d
+    Style Caching             :a3, 2026-01-10, 1d
+    
+    section Fase 2 - Alto
+    DTO Simplification        :b1, 2026-01-11, 2d
+    Rate Limiting             :b2, 2026-01-12, 2d
+    Metrics & Observability   :b3, 2026-01-13, 3d
+    
+    section Fase 3 - Escalable
+    Celery Queue (opcional)   :c1, 2026-01-16, 5d
+    Code Optimizations        :c2, 2026-01-18, 3d
+    Load Testing & Tuning     :c3, 2026-01-20, 3d
+```
+
+---
+
+## 🔗 Enlaces Útiles
+
+- [Análisis Completo de Rendimiento](docs/performance_optimization_analysis.md)
+- [Guía de Arquitectura](docs/architecture.md)
+- [Diseño de API](docs/api_design.md)
+- [Guía de Desarrollo](docs/development_guide.md)
+
+---
+
+## 📞 Contribución
+
+Para contribuir al proyecto, por favor:
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia [MIT](LICENSE).
