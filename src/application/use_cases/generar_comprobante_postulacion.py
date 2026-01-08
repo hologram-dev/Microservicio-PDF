@@ -197,6 +197,9 @@ class GenerarComprobantePostulacionUseCase:
                 "estudiante_dni": comprobante.estudiante.dni,
                 "logo_path": logo_path if os.path.exists(logo_path) else None,
                 "universidad_nombre": comprobante.universidad.nombre,
+                "universidad_correo": comprobante.universidad.correo,
+                "empresa_nombre": comprobante.empresa.nombre,
+                "empresa_telefono": comprobante.empresa.telefono,
             },
         )
         

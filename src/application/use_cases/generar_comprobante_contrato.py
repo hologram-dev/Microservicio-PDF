@@ -192,7 +192,7 @@ class GenerarComprobanteContratoUseCase:
         logo_path = os.path.join(base_dir, "utils", "images", "logoUTN.png")
         
         document = PDFDocument(
-            title=f"Contrato de Pasantía N° {comprobante.contrato.numero}",
+            title="CONTRATO DE PASANTÍA",
             author="Sistema de Pasantías",
             page_size="A4",
             orientation="portrait",
@@ -202,6 +202,9 @@ class GenerarComprobanteContratoUseCase:
                 "estudiante_dni": comprobante.estudiante.dni,
                 "logo_path": logo_path if os.path.exists(logo_path) else None,
                 "universidad_nombre": comprobante.universidad.nombre,
+                "universidad_correo": comprobante.universidad.correo,
+                "empresa_nombre": comprobante.empresa.nombre,
+                "empresa_telefono": comprobante.empresa.telefono,
             },
         )
         
@@ -231,13 +234,12 @@ class GenerarComprobanteContratoUseCase:
         comprobante: ComprobanteContratoDTO
     ) -> PDFSection:
         """Construye el header con nombre de la universidad."""
-        univ = comprobante.universidad
         
         # Subtítulo con correo si está disponible
-        contenido = univ.correo if univ.correo else ""
+        contenido = ""
         
         return PDFSection(
-            title=univ.nombre,
+            title="",
             content=contenido,
             level=1,
         )
@@ -260,9 +262,9 @@ class GenerarComprobanteContratoUseCase:
         )
         
         return PDFSection(
-            title="<b>CONTRATO DE PASANTÍA</b>",
+            title="",
             content=contenido,
-            level=1,
+            level=2,
         )
     
     def _build_tabla_datos_clave(
@@ -285,7 +287,6 @@ class GenerarComprobanteContratoUseCase:
         
         # Construir filas de la tabla
         rows = [
-            ["Estudiante:", f"{est.nombre} {est.apellido}"],
             ["DNI / Email:", f"{est.dni} / {est.email}"],
             ["Carrera:", f"{carr.nombre} ({carr.plan_estudios})"],
             ["Empresa:", f"{emp.nombre}"],
@@ -299,9 +300,9 @@ class GenerarComprobanteContratoUseCase:
         
         # Crear tabla
         tabla = PDFTable(
-            headers=["Campo", "Información"],
+            headers=[f"{est.nombre}", f"{est.apellido}"],
             rows=rows,
-            title=None,
+            title="<b>DATOS CLAVE</b>",
         )
         
         return PDFSection(
@@ -437,15 +438,12 @@ class GenerarComprobanteContratoUseCase:
         
         contenido = (
             "\n\n"
-            "______________________________          ______________________________\n\n"
-            f"Firma y sello - {emp.nombre}            Firma del/de la estudiante: {nombre_full}\n\n"
+            "______________________________ ______________________________\n\n"
+            f"Firma y sello - {emp.nombre}  Firma del/de la estudiante: {nombre_full}\n\n"
         )
-        
-        if contacto_uni:
-            contenido += f"Contacto prácticas: {contacto_uni}"
         
         return PDFSection(
             title="",
             content=contenido,
-            level=3,
+            level=2,
         )

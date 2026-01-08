@@ -161,6 +161,10 @@ class ReportLabGenerator(IPDFGenerator):
             # Detectar si hay logo en metadata para usar callbacks de header/footer
             logo_path = document.metadata.get("logo_path")
             universidad_nombre = document.metadata.get("universidad_nombre")
+            universidad_correo = document.metadata.get("universidad_correo", "")
+            empresa_nombre = document.metadata.get("empresa_nombre", "")
+            empresa_email = document.metadata.get("empresa_email", "")
+            empresa_telefono = document.metadata.get("empresa_telefono", "")
             
             # Generar el PDF (con o sin header/footer personalizado)
             if logo_path and universidad_nombre:
@@ -168,10 +172,12 @@ class ReportLabGenerator(IPDFGenerator):
                 doc.build(
                     elements,
                     onFirstPage=lambda c, d: self._draw_header_footer(
-                        c, d, logo_path, universidad_nombre
+                        c, d, logo_path, universidad_nombre,
+                        universidad_correo, empresa_nombre, empresa_email, empresa_telefono
                     ),
                     onLaterPages=lambda c, d: self._draw_header_footer(
-                        c, d, logo_path, universidad_nombre
+                        c, d, logo_path, universidad_nombre,
+                        universidad_correo, empresa_nombre, empresa_email, empresa_telefono
                     ),
                 )
             else:
@@ -382,20 +388,29 @@ class ReportLabGenerator(IPDFGenerator):
         doc,
         logo_path: str,
         universidad_nombre: str,
+        universidad_correo: str = "",
+        empresa_nombre: str = "",
+        empresa_email: str = "",
+        empresa_telefono: str = "",
     ) -> None:
         """
-        Dibuja header profesional con logo centrado y footer con número de página.
+        Dibuja header profesional con logo a la izquierda y footer con contactos.
         
         Diseño profesional:
-        - Logo UTN centrado en la parte superior
+        - Logo UTN alineado a la izquierda en la parte superior
         - Línea gris sutil horizontal
+        - Información de contacto en footer izquierdo
         - Número de página en footer derecho
         
         Args:
             canvas: Canvas de ReportLab para dibujar
             doc: Documento SimpleDocTemplate
             logo_path: Ruta al archivo del logo
-            universidad_nombre: Nombre de la universidad (no usado, solo para firma de método)
+            universidad_nombre: Nombre de la universidad
+            universidad_correo: Correo de contacto de la universidad
+            empresa_nombre: Nombre de la empresa
+            empresa_email: Email de la empresa
+            empresa_telefono: Teléfono de la empresa
         """
         from reportlab.lib.units import mm
         import os
@@ -404,13 +419,13 @@ class ReportLabGenerator(IPDFGenerator):
         margin_left = doc.leftMargin
         margin_right = doc.rightMargin
         
-        # Dibuja logo UTN CENTRADO en la parte superior
+        # Dibuja logo UTN alineado a la izquierda en la parte superior
         if logo_path and os.path.exists(logo_path):
             try:
                 logo_w = 42 * mm
                 logo_h = 14 * mm
-                # Centrar horizontalmente
-                x_logo = (width - logo_w) / 2.0
+                # Alinear a la izquierda
+                x_logo = margin_left
                 y_logo = height - doc.topMargin + 6 * mm
                 canvas.drawImage(
                     logo_path,
@@ -424,7 +439,7 @@ class ReportLabGenerator(IPDFGenerator):
                 # Si falla cargar el logo, continuar sin él
                 pass
         
-        # Línea horizontal sutil bajo header (sin texto de universidad)
+        # Línea horizontal sutil bajo header
         canvas.setStrokeColor(colors.lightgrey)
         canvas.setLineWidth(0.4)
         canvas.line(
@@ -434,11 +449,41 @@ class ReportLabGenerator(IPDFGenerator):
             height - doc.topMargin + 4
         )
         
-        # Footer: número de página (derecha, discreto)
-        canvas.setFont("Helvetica", 8)
+        # Footer: Información de contacto
+        canvas.setFont("Helvetica", 7)
         canvas.setFillColor(colors.grey)
+        
+        footer_y = doc.bottomMargin - 8
+        
+        # Línea 1: Universidad
+        if universidad_correo:
+            canvas.drawString(
+                margin_left,
+                footer_y,
+                f"Contacto universidad: {universidad_correo}"
+            )
+        
+        # Línea 2: Empresa (si hay datos)
+        if empresa_nombre or empresa_email or empresa_telefono:
+            empresa_info_parts = []
+            if empresa_nombre:
+                empresa_info_parts.append(empresa_nombre)
+            if empresa_email:
+                empresa_info_parts.append(empresa_email)
+            if empresa_telefono:
+                empresa_info_parts.append(f"Tel: {empresa_telefono}")
+            
+            empresa_info = " | ".join(empresa_info_parts)
+            canvas.drawString(
+                margin_left,
+                footer_y - 10,
+                f"Contacto empresa: {empresa_info}"
+            )
+        
+        # Número de página (derecha)
+        canvas.setFont("Helvetica", 8)
         canvas.drawRightString(
             width - margin_right,
-            doc.bottomMargin - 8,
+            footer_y,
             f"Página {doc.page}"
         )
