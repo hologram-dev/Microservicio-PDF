@@ -34,6 +34,9 @@ from src.application.use_cases import GeneratePDFUseCase
 from src.application.use_cases.generar_comprobante_postulacion import (
     GenerarComprobantePostulacionUseCase,
 )
+from src.application.use_cases.generar_comprobante_contrato import (
+    GenerarComprobanteContratoUseCase,
+)
 
 
 @lru_cache
@@ -83,6 +86,22 @@ def get_generar_comprobante_postulacion_use_case() -> GenerarComprobantePostulac
     """
     generator = get_pdf_generator()
     return GenerarComprobantePostulacionUseCase(generator)
+
+
+@lru_cache
+def get_generar_comprobante_contrato_use_case() -> GenerarComprobanteContratoUseCase:
+    """
+    Obtiene la instancia del caso de uso para generar comprobante de contrato.
+    
+    Construye el grafo de dependencias:
+    - GenerarComprobanteContratoUseCase depende de IPDFGenerator
+    - Usamos ReportLabGenerator como implementación
+    
+    Returns:
+        Instancia de GenerarComprobanteContratoUseCase
+    """
+    generator = get_pdf_generator()
+    return GenerarComprobanteContratoUseCase(generator)
 
 
 

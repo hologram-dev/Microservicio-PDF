@@ -23,11 +23,15 @@ from fastapi.responses import StreamingResponse
 from src.presentation.schemas.comprobante_postulacion_schemas import (
     ComprobantePostulacionRequest,
 )
+from src.presentation.schemas.comprobante_contrato_schemas import (
+    ComprobanteContratoRequest,
+)
 from src.presentation.dependencies.container import (
     get_generar_comprobante_postulacion_use_case,
+    get_generar_comprobante_contrato_use_case,
 )
 from src.application.dto import (
-    ComprobantePostulacionDTO, ComprobanteContratoDTO,
+    ComprobantePostulacionDTO,
     EstudianteDTO,
     UniversidadDTO,
     CarreraDTO,
@@ -35,6 +39,7 @@ from src.application.dto import (
     ProyectoDTO,
     PuestoDTO,
     PostulacionDTO,
+    ContratoDTO,
 )
 
 router = APIRouter(prefix="/pdf", tags=["PDF"])
