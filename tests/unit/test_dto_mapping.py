@@ -95,24 +95,24 @@ def test_full_comprobante_model_dump():
             "direccion": "Calle Empresa 456",
             "codigo_postal": "5001",
             "telefono": "987654321",
-            "codigo": "EMP001"
+            "codigo": 1001  # Integer, not string
         },
         "proyecto": {
             "nombre": "Proyecto Alpha",
             "fecha_inicio": "2024-01-01",
             "descripcion": "Desarrollo web",
-            "numero": "PRY001",
+            "numero": 2001,  # Integer, not string
             "estado": "activo",
             "fecha_fin": "2024-12-31"
         },
         "puesto": {
             "nombre": "Developer",
             "descripcion": "Full Stack Developer",
-            "codigo": "DEV001",
+            "codigo": 3001,  # Integer, not string
             "horas_dedicadas": 40
         },
         "postulacion": {
-            "numero": "POST001",
+            "numero": 4001,  # Integer, not string
             "fecha": "2024-01-15",
             "cantidad_materias_aprobadas": 25,
             "cantidad_materias_regulares": 5,
@@ -140,7 +140,8 @@ def test_full_comprobante_model_dump():
     assert comprobante_dto.empresa.nombre == "Tech Corp"
     assert comprobante_dto.proyecto.nombre == "Proyecto Alpha"
     assert comprobante_dto.puesto.nombre == "Developer"
-    assert comprobante_dto.postulacion.numero == "POST001"
+    assert comprobante_dto.postulacion.numero == 4001  # Integer
+
 
 
 def test_model_dump_preserves_all_fields():

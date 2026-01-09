@@ -23,71 +23,119 @@ import random
 
 
 # Payload de ejemplo para generación de PDF
+# IMPORTANTE: Actualiza BASE_URL con el puerto correcto donde corre tu servicio
+# - Si usas docker: http://localhost:9000 (puerto mapeado en docker-compose.yml)
+# - Si usas local: http://localhost:8000
+BASE_URL = "http://localhost:9000"  # ⚠️ Cambiar según tu configuración
+
 PAYLOAD_POSTULACION = {
-    "estudiante": {
-        "nombre": "Juan",
-        "apellido": "Pérez",
-        "dni": "12345678",
-        "email": "juan.perez@example.com",
-        "cuil": "20-12345678-9",
-        "fecha_nacimiento": "1990-01-01",
-        "tipo_dni": "DNI"
-    },
-    "universidad": {
-        "nombre": "Universidad Tecnológica Nacional",
-        "direccion": "Av. Independencia 850",
-        "codigo_postal": "5000",
-        "correo": "info@utn.edu.ar",
-        "telefono": "351-4520800"
-    },
-    "carrera": {
-        "nombre": "Ingeniería en Sistemas de Información",
-        "codigo": "K08",
-        "descripcion": "Carrera de grado en Ingeniería",
-        "plan_estudios": "2008"
-    },
-    "empresa": {
-        "nombre": "Tech Solutions SA",
-        "direccion": "Calle Empresarial 456",
-        "codigo_postal": "5001",
-        "telefono": "351-9876543",
-        "codigo": "EMP001"
-    },
-    "proyecto": {
-        "nombre": "Sistema de Gestión Web",
-        "fecha_inicio": "2024-01-15",
-        "descripcion": "Desarrollo de plataforma web integral",
-        "numero": "PRY2024001",
-        "estado": "activo",
-        "fecha_fin": "2024-12-31"
-    },
-    "puesto": {
-        "nombre": "Desarrollador Full Stack",
-        "descripcion": "Desarrollo de frontend y backend",
-        "codigo": "DEV-FS-001",
-        "horas_dedicadas": 40
-    },
-    "postulacion": {
-        "numero": "POST2024001",
-        "fecha": "2024-01-10",
-        "cantidad_materias_aprobadas": 28,
-        "cantidad_materias_regulares": 4,
-        "estado": "aprobada"
-    }
+  "estudiante": {
+    "nombre": "María",
+    "apellido": "González",
+    "dni": "42856123",
+    "email": "maria.gonzalez@gmail.com",
+    "cuil": "27-42856123-8",
+    "fecha_nacimiento": "2001-03-15",
+    "tipo_dni": "DNI"
+  },
+  "universidad": {
+    "nombre": "Universidad Nacional de Córdoba",
+    "direccion": "Av. Haya de la Torre s/n, Ciudad Universitaria",
+    "codigo_postal": 5000,
+    "correo": "pasantias@unc.edu.ar",
+    "telefono": "+543514334000"
+  },
+  "carrera": {
+    "nombre": "Ingeniería en Sistemas de Información",
+    "codigo": "ISI-2020",
+    "plan_estudios": "Plan 2020"
+  },
+  "empresa": {
+    "nombre": "TechnoSoft Argentina S.A.",
+    "direccion": "Av. Colón 500, Piso 8",
+    "codigo_postal": 5000,
+    "telefono": "+543514238900",
+    "codigo": 15847
+  },
+  "proyecto": {
+    "nombre": "Sistema de Gestión de Recursos Humanos",
+    "fecha_inicio": "2026-02-01",
+    "descripcion": "Desarrollo de un sistema integral para la gestión de recursos humanos incluyendo módulos de legajos, asistencia, liquidaciones y capacitación",
+    "numero": 2026001,
+    "estado": "Activo",
+    "fecha_fin": "2026-08-01"
+  },
+  "puesto": {
+    "nombre": "Desarrollador Backend Junior",
+    "descripcion": "Desarrollo de APIs REST con Python/FastAPI y mantenimiento de bases de datos PostgreSQL",
+    "codigo": 1025,
+    "horas_dedicadas": 30
+  },
+  "postulacion": {
+    "numero": 450123,
+    "fecha": "2025-12-15T10:30:00-03:00",
+    "cantidad_materias_aprobadas": 28,
+    "cantidad_materias_regulares": 3,
+    "estado": "Aprobada"
+  }
 }
 
 
 PAYLOAD_CONTRATO = {
-    **PAYLOAD_POSTULACION,
-    "contrato": {
-        "numero": "CONT2024001",
-        "fecha_inicio": "2024-02-01",
-        "fecha_fin": "2024-12-31",
-        "fecha_emision": "2024-01-20",
-        "estado": "vigente"
-    }
+  "estudiante": {
+    "nombre": "María",
+    "apellido": "González",
+    "dni": "42856123",
+    "email": "maria.gonzalez@gmail.com"
+  },
+  "universidad": {
+    "nombre": "Universidad Nacional de Córdoba",
+    "direccion": "Av. Haya de la Torre s/n, Ciudad Universitaria",
+    "codigo_postal": "5000",
+    "correo": "pasantias@unc.edu.ar",
+    "telefono": "+543514334000"
+  },
+  "carrera": {
+    "nombre": "Ingeniería en Sistemas de Información",
+    "codigo": "ISI-2020",
+    "plan_estudios": "Plan 2020"
+  },
+  "empresa": {
+    "nombre": "TechnoSoft Argentina S.A.",
+    "direccion": "Av. Colón 500, Piso 8",
+    "codigo_postal": "5000",
+    "telefono": "+543514238900",
+    "codigo": 15847
+  },
+  "proyecto": {
+    "nombre": "Sistema de Gestión de Recursos Humanos",
+    "fecha_inicio": "2026-02-01",
+    "descripcion": "Desarrollo de un sistema integral para la gestión de recursos humanos",
+    "numero": 2026001,
+    "estado": "Activo",
+    "fecha_fin": "2026-08-01"
+  },
+  "puesto": {
+    "nombre": "Desarrollador Backend Junior",
+    "descripcion": "Desarrollo de APIs REST con Python/FastAPI",
+    "codigo": 1025,
+    "horas_dedicadas": 30
+  },
+  "postulacion": {
+    "numero": 450123,
+    "fecha": "2025-12-15T10:30:00-03:00",
+    "cantidad_materias_aprobadas": 28,
+    "cantidad_materias_regulares": 3,
+    "estado": "Aprobada"
+  },
+  "contrato": {
+    "numero": 550234,
+    "fecha_inicio": "2026-02-01",
+    "fecha_fin": "2026-08-01",
+    "fecha_emision": "2026-01-07",
+    "estado": "Activo"
+  }
 }
-
 
 class PDFUser(HttpUser):
     """
@@ -108,7 +156,7 @@ class PDFUser(HttpUser):
         # Variar algunos datos para simular requests diferentes
         payload = PAYLOAD_POSTULACION.copy()
         payload["estudiante"]["nombre"] = random.choice(["Juan", "María", "Carlos", "Ana"])
-        payload["postulacion"]["numero"] = f"POST2024{random.randint(1, 9999):04d}"
+        payload["postulacion"]["numero"] = random.randint(400000, 499999)  # Integer, no string
         
         with self.client.post(
             "/api/v1/pdf/generate/comprobante_postulacion",
@@ -132,7 +180,7 @@ class PDFUser(HttpUser):
         """Genera PDF de comprobante de contrato."""
         payload = PAYLOAD_CONTRATO.copy()
         payload["estudiante"]["nombre"] = random.choice(["Pedro", "Lucía", "Diego", "Sofía"])
-        payload["contrato"]["numero"] = f"CONT2024{random.randint(1, 9999):04d}"
+        payload["contrato"]["numero"] = random.randint(500000, 599999)  # Integer, no string
         
         with self.client.post(
             "/api/v1/pdf/generate/comprobante_contrato",
@@ -182,7 +230,7 @@ class HeavyLoadUser(HttpUser):
     def rapid_fire_pdf_generation(self):
         """Genera PDFs en ráfaga rápida."""
         payload = PAYLOAD_POSTULACION.copy()
-        payload["postulacion"]["numero"] = f"LOAD{random.randint(1, 99999):05d}"
+        payload["postulacion"]["numero"] = random.randint(100000, 999999)  # Integer para carga pesada
         
         self.client.post(
             "/api/v1/pdf/generate/comprobante_postulacion",
